@@ -75,17 +75,19 @@ public interface Editor<T> extends EditorAction {
     }
 
     @Override
-    default boolean execute(EditorActor actor, String[] args) {
+    default void execute(EditorActor actor, String[] args) {
         if (args.length == 0) {
-            return actor.sendUsage(this);
+            actor.sendUsage(this);
+            return;
         }
         String command = args[0];
         EditorAction action = actions().get(command);
         if (action == null) {
-            return false;
+            actor.sendMessage("Invalid action: " + command, false);
+            return;
         }
         String[] subArgs = new String[args.length - 1];
         System.arraycopy(args, 1, subArgs, 0, args.length - 1);
-        return action.execute(actor, subArgs);
+        action.execute(actor, subArgs);
     }
 }

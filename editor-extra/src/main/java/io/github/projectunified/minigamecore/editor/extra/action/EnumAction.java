@@ -32,9 +32,8 @@ public abstract class EnumAction<T extends Enum<T>> implements EditorAction {
      * @param actor the actor
      * @param value the value
      * @param args  the arguments
-     * @return true if the action is executed successfully
      */
-    public abstract boolean execute(EditorActor actor, T value, String[] args);
+    public abstract void execute(EditorActor actor, T value, String[] args);
 
     @Override
     public String usage() {
@@ -50,16 +49,16 @@ public abstract class EnumAction<T extends Enum<T>> implements EditorAction {
     }
 
     @Override
-    public boolean execute(EditorActor actor, String[] args) {
+    public void execute(EditorActor actor, String[] args) {
         if (args.length < 1) {
-            return actor.sendUsage(this);
+            actor.sendUsage(this);
+            return;
         }
         try {
             T value = Enum.valueOf(enumClass, args[0].toUpperCase(Locale.ROOT));
-            return execute(actor, value, args);
+            execute(actor, value, args);
         } catch (IllegalArgumentException e) {
             actor.sendMessage("Invalid value: " + args[0], false);
-            return false;
         }
     }
 }

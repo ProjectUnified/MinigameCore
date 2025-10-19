@@ -16,15 +16,13 @@ public interface EditorActor {
      * Send the usage of the action
      *
      * @param action the action
-     * @return true if the usage is sent successfully
      */
-    boolean sendUsage(EditorAction action);
+    void sendUsage(EditorAction action);
 
     /**
      * Send the usage of the editor
      *
      * @param editor the editor
-     * @return true if the usage is sent successfully
      */
-    boolean sendUsage(Editor<?> editor);
+    void sendUsage(Editor<?> editor);
 }

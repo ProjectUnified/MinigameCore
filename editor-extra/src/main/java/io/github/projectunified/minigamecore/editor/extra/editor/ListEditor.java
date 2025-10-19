@@ -24,15 +24,14 @@ public abstract class ListEditor<T> implements Editor<List<T>> {
         this.actionMap = new HashMap<>();
         this.actionMap.put("add", new EditorAction() {
             @Override
-            public boolean execute(EditorActor actor, String[] args) {
+            public void execute(EditorActor actor, String[] args) {
                 T value = create(actor, args);
                 if (value == null) {
                     actor.sendMessage("Cannot create (" + Arrays.toString(args) + ")", false);
-                    return false;
+                    return;
                 }
                 list.add(value);
                 actor.sendMessage("Added (" + Arrays.toString(args) + ") at index " + (list.size() - 1), true);
-                return true;
             }
 
             @Override
@@ -52,32 +51,31 @@ public abstract class ListEditor<T> implements Editor<List<T>> {
         });
         this.actionMap.put("edit", new EditorAction() {
             @Override
-            public boolean execute(EditorActor actor, String[] args) {
+            public void execute(EditorActor actor, String[] args) {
                 if (args.length < 1) {
-                    return false;
+                    return;
                 }
                 int index;
                 try {
                     index = Integer.parseInt(args[0]);
                 } catch (NumberFormatException e) {
                     actor.sendMessage("Invalid index: " + args[0], false);
-                    return false;
+                    return;
                 }
                 if (index < 0 || index >= list.size()) {
                     actor.sendMessage("Index out of bounds: " + index, false);
-                    return false;
+                    return;
                 }
                 T value = list.get(index);
                 T edited = edit(value, actor, Arrays.copyOfRange(args, 1, args.length));
                 if (edited == null) {
                     actor.sendMessage("Cannot edit (" + Arrays.toString(args) + ")", false);
-                    return false;
+                    return;
                 }
                 if (edited != value) {
                     list.set(index, edited);
                 }
                 actor.sendMessage("Edited (" + Arrays.toString(args) + ")", true);
-                return true;
             }
 
             @Override
@@ -115,24 +113,23 @@ public abstract class ListEditor<T> implements Editor<List<T>> {
         });
         this.actionMap.put("remove", new EditorAction() {
             @Override
-            public boolean execute(EditorActor actor, String[] args) {
+            public void execute(EditorActor actor, String[] args) {
                 if (args.length < 1) {
-                    return false;
+                    return;
                 }
                 int index;
                 try {
                     index = Integer.parseInt(args[0]);
                 } catch (NumberFormatException e) {
                     actor.sendMessage("Invalid index: " + args[0], false);
-                    return false;
+                    return;
                 }
                 if (index < 0 || index >= list.size()) {
                     actor.sendMessage("Index out of bounds: " + index, false);
-                    return false;
+                    return;
                 }
                 list.remove(index);
                 actor.sendMessage("Removed element at index " + index, true);
-                return true;
             }
 
             @Override
@@ -157,9 +154,9 @@ public abstract class ListEditor<T> implements Editor<List<T>> {
         });
         this.actionMap.put("move", new EditorAction() {
             @Override
-            public boolean execute(EditorActor actor, String[] args) {
+            public void execute(EditorActor actor, String[] args) {
                 if (args.length < 2) {
-                    return false;
+                    return;
                 }
 
                 int index;
@@ -167,7 +164,7 @@ public abstract class ListEditor<T> implements Editor<List<T>> {
                     index = Integer.parseInt(args[0]);
                 } catch (NumberFormatException e) {
                     actor.sendMessage("Invalid index: " + args[0], false);
-                    return false;
+                    return;
                 }
 
                 int newIndex;
@@ -175,24 +172,23 @@ public abstract class ListEditor<T> implements Editor<List<T>> {
                     newIndex = Integer.parseInt(args[1]);
                 } catch (NumberFormatException e) {
                     actor.sendMessage("Invalid new index: " + args[1], false);
-                    return false;
+                    return;
                 }
 
                 if (index < 0 || index >= list.size()) {
                     actor.sendMessage("Index out of bounds: " + index, false);
-                    return false;
+                    return;
                 }
 
                 if (newIndex < 0 || newIndex >= list.size()) {
                     actor.sendMessage("New index out of bounds: " + newIndex, false);
-                    return false;
+                    return;
                 }
 
                 T value = list.get(index);
                 list.remove(index);
                 list.add(newIndex, value);
                 actor.sendMessage("Moved element at index " + index + " to index " + newIndex, true);
-                return true;
             }
 
             @Override

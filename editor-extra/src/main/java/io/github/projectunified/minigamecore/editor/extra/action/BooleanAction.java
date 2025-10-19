@@ -30,15 +30,15 @@ public abstract class BooleanAction implements EditorAction {
      * @param actor the actor
      * @param value the value
      * @param args  the arguments
-     * @return true if the action is executed successfully
      */
-    public abstract boolean execute(EditorActor actor, boolean value, String[] args);
+    public abstract void execute(EditorActor actor, boolean value, String[] args);
 
     @Override
-    public boolean execute(EditorActor actor, String[] args) {
+    public void execute(EditorActor actor, String[] args) {
         if (args.length < 1) {
-            return actor.sendUsage(this);
+            actor.sendUsage(this);
+            return;
         }
-        return execute(actor, Boolean.parseBoolean(args[0]), Arrays.copyOfRange(args, 1, args.length));
+        execute(actor, Boolean.parseBoolean(args[0]), Arrays.copyOfRange(args, 1, args.length));
     }
 }

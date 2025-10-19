@@ -22,15 +22,14 @@ public abstract class ValueEditor<T> implements Editor<T> {
         this.actionMap = new HashMap<>();
         this.actionMap.put("set", new EditorAction() {
             @Override
-            public boolean execute(EditorActor actor, String[] args) {
+            public void execute(EditorActor actor, String[] args) {
                 T value = create(actor, args);
                 if (value == null) {
                     actor.sendMessage("Cannot create (" + Arrays.toString(args) + ")", false);
-                    return false;
+                    return;
                 }
                 ValueEditor.this.value = value;
                 actor.sendMessage("Set (" + Arrays.toString(args) + ")", true);
-                return true;
             }
 
             @Override
@@ -50,20 +49,19 @@ public abstract class ValueEditor<T> implements Editor<T> {
         });
         this.actionMap.put("edit", new EditorAction() {
             @Override
-            public boolean execute(EditorActor actor, String[] args) {
+            public void execute(EditorActor actor, String[] args) {
                 if (value == null) {
-                    return false;
+                    return;
                 }
                 T edited = edit(value, actor, args);
                 if (edited == null) {
                     actor.sendMessage("Cannot edit (" + Arrays.toString(args) + ")", false);
-                    return false;
+                    return;
                 }
                 if (edited != value) {
                     value = edited;
                 }
                 actor.sendMessage("Edited (" + Arrays.toString(args) + ")", true);
-                return true;
             }
 
             @Override

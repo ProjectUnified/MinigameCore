@@ -12,9 +12,8 @@ public interface EditorAction {
      *
      * @param actor the actor
      * @param args  the arguments
-     * @return true if the action is executed successfully
      */
-    boolean execute(EditorActor actor, String[] args);
+    void execute(EditorActor actor, String[] args);
 
     /**
      * Get the description of the action

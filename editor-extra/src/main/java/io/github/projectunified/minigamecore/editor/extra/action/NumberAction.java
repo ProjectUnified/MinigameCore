@@ -34,9 +34,8 @@ public abstract class NumberAction implements EditorAction {
      * @param actor the actor
      * @param value the value
      * @param args  the arguments
-     * @return true if the action is executed successfully
      */
-    public abstract boolean execute(EditorActor actor, Number value, String[] args);
+    public abstract void execute(EditorActor actor, Number value, String[] args);
 
     /**
      * Get number suggestions
@@ -49,16 +48,16 @@ public abstract class NumberAction implements EditorAction {
     }
 
     @Override
-    public boolean execute(EditorActor actor, String[] args) {
+    public void execute(EditorActor actor, String[] args) {
         if (args.length < 1) {
-            return actor.sendUsage(this);
+            actor.sendUsage(this);
+            return;
         }
         String value = args[0];
         try {
-            return execute(actor, Double.parseDouble(value), Arrays.copyOfRange(args, 1, args.length));
+            execute(actor, Double.parseDouble(value), Arrays.copyOfRange(args, 1, args.length));
         } catch (NumberFormatException e) {
             actor.sendMessage("Invalid Number: " + value, false);
-            return false;
         }
     }
 }
