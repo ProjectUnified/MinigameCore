@@ -58,13 +58,13 @@ public class Arena extends FeatureUnit implements Runnable {
     }
 
     /**
-     * This is called when the state is changed.
-     * This is usually used to do actions on state changed.
-     * If you did change the state with {@link #setNextState(Class)}, set the return value to false.
+     * Called when the arena's state is about to change.
+     * This is usually used to perform actions or validations on state transitions.
+     * Return false to cancel the state change (e.g., if you manually set a new state via {@link #setNextState(Class)}).
      *
-     * @param oldStage the old state
-     * @param newStage the new state
-     * @return true if the change is successful, otherwise false
+     * @param oldStage the old state (may be null)
+     * @param newStage the new state (may be null)
+     * @return true if the change should proceed, false to cancel it
      */
     protected boolean callStateChanged(GameState oldStage, GameState newStage) {
         return true;

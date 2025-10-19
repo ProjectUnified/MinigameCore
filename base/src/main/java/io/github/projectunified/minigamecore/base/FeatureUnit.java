@@ -18,7 +18,7 @@ public abstract class FeatureUnit implements Initializer {
      * @param parentList the parent {@link FeatureUnit} list
      */
     public FeatureUnit(List<FeatureUnit> parentList) {
-        this.parentList = parentList;
+        this.parentList = Collections.unmodifiableList(new ArrayList<>(parentList));
     }
 
     /**
@@ -27,7 +27,7 @@ public abstract class FeatureUnit implements Initializer {
      * @param parent the parent {@link FeatureUnit}
      */
     public FeatureUnit(FeatureUnit... parent) {
-        this(parent.length == 0 ? Collections.emptyList() : Arrays.asList(parent));
+        this.parentList = parent.length == 0 ? Collections.emptyList() : Collections.unmodifiableList(new ArrayList<>(Arrays.asList(parent)));
     }
 
     private static <T> Set<Class<? extends T>> getSuperClasses(Class<T> baseClass, Class<? extends T> childClass) {
@@ -83,10 +83,11 @@ public abstract class FeatureUnit implements Initializer {
     }
 
     /**
-     * Set the parent {@link FeatureUnit} list
+     * Get the parent {@link FeatureUnit} list
      *
      * @return the parent {@link FeatureUnit} list
      */
+    @SuppressWarnings("unused")
     public List<FeatureUnit> getParentList() {
         return parentList;
     }
@@ -154,6 +155,7 @@ public abstract class FeatureUnit implements Initializer {
      * @param <T>          the type of the feature
      * @return the instance of the feature
      */
+    @SuppressWarnings("unused")
     public <T extends Feature> T getFeature(Class<T> featureClass) {
         Feature feature = featureMap.get(featureClass);
         T checkedFeature = featureClass.isInstance(feature) ? featureClass.cast(feature) : null;
@@ -177,6 +179,7 @@ public abstract class FeatureUnit implements Initializer {
      * @param deep if true, it will get all classes of the game states from the parent
      * @return the classes
      */
+    @SuppressWarnings("unused")
     public Set<Class<? extends GameState>> getGameStates(boolean deep) {
         Set<Class<? extends GameState>> classes = new HashSet<>(gameStateMap.keySet());
         if (deep) {
@@ -193,6 +196,7 @@ public abstract class FeatureUnit implements Initializer {
      * @param deep if true, it will get all classes of the features from the parent
      * @return the classes
      */
+    @SuppressWarnings("unused")
     public Set<Class<? extends Feature>> getFeatures(boolean deep) {
         Set<Class<? extends Feature>> classes = new HashSet<>(featureMap.keySet());
         if (deep) {
