@@ -41,13 +41,4 @@ public interface EditorAction {
     default String usage() {
         return "";
     }
-
-    /**
-     * Check if the action requires arguments
-     *
-     * @return true if it does
-     */
-    default boolean requiresArgs() {
-        return !usage().isEmpty();
-    }
 }
