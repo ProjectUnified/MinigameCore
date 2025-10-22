@@ -6,7 +6,7 @@
 
     <groupId>io.github.projectunified</groupId>
     <artifactId>minigamecore</artifactId>
-    <version>4.3.0-SNAPSHOT</version>
+    <version>4.3.0</version>
     <packaging>pom</packaging>
 
     <name>MinigameCore</name>
