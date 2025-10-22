@@ -2,6 +2,7 @@ package io.github.projectunified.minigamecore.editor.extra.action;
 
 import io.github.projectunified.minigamecore.editor.EditorAction;
 import io.github.projectunified.minigamecore.editor.EditorActor;
+import io.github.projectunified.minigamecore.editor.EditorString;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -11,9 +12,14 @@ import java.util.List;
  * The {@link EditorAction} for boolean value
  */
 public abstract class BooleanAction implements EditorAction {
+    /**
+     * The string of the usage of the boolean action
+     */
+    public static final EditorString USAGE = EditorString.of("action.boolean.usage", "<true|false>");
+
     @Override
-    public String usage() {
-        return "<true|false>";
+    public EditorString usage() {
+        return USAGE;
     }
 
     @Override

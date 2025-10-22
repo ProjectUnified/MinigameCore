@@ -3,6 +3,7 @@ package io.github.projectunified.minigamecore.editor.extra.editor;
 import io.github.projectunified.minigamecore.editor.Editor;
 import io.github.projectunified.minigamecore.editor.EditorAction;
 import io.github.projectunified.minigamecore.editor.EditorActor;
+import io.github.projectunified.minigamecore.editor.EditorString;
 
 import java.util.*;
 
@@ -12,6 +13,40 @@ import java.util.*;
  * @param <T> the type of the value
  */
 public abstract class ValueEditor<T> implements Editor<T> {
+    /**
+     * The error message when cannot create a value.
+     */
+    public static final EditorString SET_CANNOT_CREATE = EditorString.of("editor.value.set.cannot_create", "Cannot create (%s)");
+    /**
+     * The success message for setting a value.
+     */
+    public static final EditorString SET_SUCCESS = EditorString.of("editor.value.set.success", "Set (%s)");
+    /**
+     * The description message for the set action.
+     */
+    public static final EditorString SET_DESCRIPTION = EditorString.of("editor.value.set.description", "Set the value");
+    /**
+     * The usage message for the set action.
+     */
+    public static final EditorString SET_USAGE = EditorString.of("editor.value.set.usage", "[args...]");
+
+    /**
+     * The error message when cannot edit a value.
+     */
+    public static final EditorString EDIT_CANNOT_EDIT = EditorString.of("editor.value.edit.cannot_edit", "Cannot edit (%s)");
+    /**
+     * The success message for editing a value.
+     */
+    public static final EditorString EDIT_SUCCESS = EditorString.of("editor.value.edit.success", "Edited (%s)");
+    /**
+     * The description message for the edit action.
+     */
+    public static final EditorString EDIT_DESCRIPTION = EditorString.of("editor.value.edit.description", "Edit the value");
+    /**
+     * The usage message for the edit action.
+     */
+    public static final EditorString EDIT_USAGE = EditorString.of("editor.value.edit.usage", "[args...]");
+
     private final Map<String, EditorAction> actionMap;
     private T value;
 
@@ -23,28 +58,28 @@ public abstract class ValueEditor<T> implements Editor<T> {
         this.actionMap.put("set", new EditorAction() {
             @Override
             public void execute(EditorActor actor, String[] args) {
-                T value = create(actor, args);
+                T value = set(actor, args);
                 if (value == null) {
-                    actor.sendMessage("Cannot create (" + Arrays.toString(args) + ")", false);
+                    actor.sendMessage(SET_CANNOT_CREATE, Arrays.toString(args));
                     return;
                 }
                 ValueEditor.this.value = value;
-                actor.sendMessage("Set (" + Arrays.toString(args) + ")", true);
+                actor.sendMessage(SET_SUCCESS, Arrays.toString(args));
             }
 
             @Override
-            public String description() {
-                return "Set the value";
+            public EditorString description() {
+                return SET_DESCRIPTION;
             }
 
             @Override
-            public String usage() {
-                return createUsage();
+            public EditorString usage() {
+                return setUsage();
             }
 
             @Override
             public Collection<String> complete(EditorActor actor, String[] args) {
-                return createComplete(actor, args);
+                return setComplete(actor, args);
             }
         });
         this.actionMap.put("edit", new EditorAction() {
@@ -55,22 +90,22 @@ public abstract class ValueEditor<T> implements Editor<T> {
                 }
                 T edited = edit(value, actor, args);
                 if (edited == null) {
-                    actor.sendMessage("Cannot edit (" + Arrays.toString(args) + ")", false);
+                    actor.sendMessage(EDIT_CANNOT_EDIT, Arrays.toString(args));
                     return;
                 }
                 if (edited != value) {
                     value = edited;
                 }
-                actor.sendMessage("Edited (" + Arrays.toString(args) + ")", true);
+                actor.sendMessage(EDIT_SUCCESS, Arrays.toString(args));
             }
 
             @Override
-            public String description() {
-                return "Edit the value";
+            public EditorString description() {
+                return EDIT_DESCRIPTION;
             }
 
             @Override
-            public String usage() {
+            public EditorString usage() {
                 return editUsage();
             }
 
@@ -83,30 +118,30 @@ public abstract class ValueEditor<T> implements Editor<T> {
     }
 
     /**
-     * Create a new value
+     * Set a new value
      *
      * @param actor the actor
      * @param args  the arguments
-     * @return the value or null if it cannot be created
+     * @return the value or null if it cannot be set
      */
-    protected abstract T create(EditorActor actor, String[] args);
+    protected abstract T set(EditorActor actor, String[] args);
 
     /**
-     * Get the completion suggestions for actions that create a new value, given the arguments
+     * Get the completion suggestions for actions that set a new value, given the arguments
      *
      * @param actor the action
      * @param args  the argument
      * @return the suggestions
      */
-    protected abstract Collection<String> createComplete(EditorActor actor, String[] args);
+    protected abstract Collection<String> setComplete(EditorActor actor, String[] args);
 
     /**
-     * Get the usage of the "create" action
+     * Get the usage of the set action
      *
      * @return the usage
      */
-    protected String createUsage() {
-        return "[args...]";
+    protected EditorString setUsage() {
+        return SET_USAGE;
     }
 
     /**
@@ -133,8 +168,8 @@ public abstract class ValueEditor<T> implements Editor<T> {
      *
      * @return the usage
      */
-    protected String editUsage() {
-        return "[args...]";
+    protected EditorString editUsage() {
+        return EDIT_USAGE;
     }
 
     @Override

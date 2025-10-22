@@ -2,6 +2,7 @@ package io.github.projectunified.minigamecore.editor.extra.action;
 
 import io.github.projectunified.minigamecore.editor.EditorAction;
 import io.github.projectunified.minigamecore.editor.EditorActor;
+import io.github.projectunified.minigamecore.editor.EditorString;
 
 import java.util.Collections;
 import java.util.List;
@@ -15,6 +16,15 @@ import java.util.stream.Stream;
  * @param <T> the type of the enum
  */
 public abstract class EnumAction<T extends Enum<T>> implements EditorAction {
+    /**
+     * The string of the usage of the enum action
+     */
+    public static final EditorString USAGE = EditorString.of("action.enum.usage", "<value>");
+    /**
+     * The string of the message when the actor uses an invalid value
+     */
+    public static final EditorString INVALID_VALUE = EditorString.of("action.enum.invalid_value", "Invalid value: %s");
+
     private final Class<T> enumClass;
 
     /**
@@ -36,8 +46,8 @@ public abstract class EnumAction<T extends Enum<T>> implements EditorAction {
     public abstract void execute(EditorActor actor, T value, String[] args);
 
     @Override
-    public String usage() {
-        return "<value>";
+    public EditorString usage() {
+        return USAGE;
     }
 
     @Override
@@ -58,7 +68,7 @@ public abstract class EnumAction<T extends Enum<T>> implements EditorAction {
             T value = Enum.valueOf(enumClass, args[0].toUpperCase(Locale.ROOT));
             execute(actor, value, args);
         } catch (IllegalArgumentException e) {
-            actor.sendMessage("Invalid value: " + args[0], false);
+            actor.sendMessage(INVALID_VALUE, args[0]);
         }
     }
 }

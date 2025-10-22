@@ -2,6 +2,7 @@ package io.github.projectunified.minigamecore.editor.extra.action;
 
 import io.github.projectunified.minigamecore.editor.EditorAction;
 import io.github.projectunified.minigamecore.editor.EditorActor;
+import io.github.projectunified.minigamecore.editor.EditorString;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -15,9 +16,18 @@ import java.util.stream.Stream;
  * The {@link EditorAction} for number value
  */
 public abstract class NumberAction implements EditorAction {
+    /**
+     * The string of the usage of the number action
+     */
+    public static final EditorString USAGE = EditorString.of("action.number.usage", "<value>");
+    /**
+     * The string of the message when the actor uses an invalid value
+     */
+    public static final EditorString INVALID_VALUE = EditorString.of("action.enum.invalid_value", "Invalid value: %s");
+
     @Override
-    public String usage() {
-        return "<value>";
+    public EditorString usage() {
+        return USAGE;
     }
 
     @Override
@@ -57,7 +67,7 @@ public abstract class NumberAction implements EditorAction {
         try {
             execute(actor, Double.parseDouble(value), Arrays.copyOfRange(args, 1, args.length));
         } catch (NumberFormatException e) {
-            actor.sendMessage("Invalid Number: " + value, false);
+            actor.sendMessage(INVALID_VALUE, value);
         }
     }
 }

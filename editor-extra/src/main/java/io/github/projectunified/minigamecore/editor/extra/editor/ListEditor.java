@@ -3,6 +3,7 @@ package io.github.projectunified.minigamecore.editor.extra.editor;
 import io.github.projectunified.minigamecore.editor.Editor;
 import io.github.projectunified.minigamecore.editor.EditorAction;
 import io.github.projectunified.minigamecore.editor.EditorActor;
+import io.github.projectunified.minigamecore.editor.EditorString;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -14,6 +15,98 @@ import java.util.stream.IntStream;
  * @param <T> the type of the element in the exported list
  */
 public abstract class ListEditor<T> implements Editor<List<T>> {
+    /**
+     * The error message when cannot create an element.
+     */
+    public static final EditorString CREATE_CANNOT_CREATE = EditorString.of("editor.list.create.cannot_create", "Cannot create (%s)");
+    /**
+     * The success message for creating an element.
+     */
+    public static final EditorString CREATE_SUCCESS = EditorString.of("editor.list.create.success", "Added (%s) at index %d");
+    /**
+     * The description message for the "create" action.
+     */
+    public static final EditorString CREATE_DESCRIPTION = EditorString.of("editor.list.create.description", "Add element to list");
+    /**
+     * The usage message for the "create" action.
+     */
+    public static final EditorString CREATE_USAGE = EditorString.of("editor.list.create.usage", "[args...]");
+
+    /**
+     * The error message for invalid index in edit action.
+     */
+    public static final EditorString EDIT_INVALID_INDEX = EditorString.of("editor.list.edit.invalid_index", "Invalid index: %s");
+    /**
+     * The error message for index out of bounds in edit action.
+     */
+    public static final EditorString EDIT_OUT_OF_BOUNDS = EditorString.of("editor.list.edit.out_of_bounds", "Index out of bounds: %d");
+    /**
+     * The error message when cannot edit an element.
+     */
+    public static final EditorString EDIT_CANNOT_EDIT = EditorString.of("editor.list.edit.cannot_edit", "Cannot edit (%s)");
+    /**
+     * The success message for editing an element.
+     */
+    public static final EditorString EDIT_SUCCESS = EditorString.of("editor.list.edit.success", "Edited (%s)");
+    /**
+     * The description message for the edit action.
+     */
+    public static final EditorString EDIT_DESCRIPTION = EditorString.of("editor.list.edit.description", "Edit element in the list");
+    /**
+     * The usage message for the edit action.
+     */
+    public static final EditorString EDIT_USAGE = EditorString.of("editor.list.edit.usage", "<index> [args...]");
+
+    /**
+     * The error message for invalid index in remove action.
+     */
+    public static final EditorString REMOVE_INVALID_INDEX = EditorString.of("editor.list.remove.invalid_index", "Invalid index: %s");
+    /**
+     * The error message for index out of bounds in remove action.
+     */
+    public static final EditorString REMOVE_OUT_OF_BOUNDS = EditorString.of("editor.list.remove.out_of_bounds", "Index out of bounds: %d");
+    /**
+     * The success message for removing an element.
+     */
+    public static final EditorString REMOVE_SUCCESS = EditorString.of("editor.list.remove.success", "Removed element at index %d");
+    /**
+     * The description message for the remove action.
+     */
+    public static final EditorString REMOVE_DESCRIPTION = EditorString.of("editor.list.remove.description", "Remove element at index");
+    /**
+     * The usage message for the remove action.
+     */
+    public static final EditorString REMOVE_USAGE = EditorString.of("editor.list.remove.usage", "<index>");
+
+    /**
+     * The error message for invalid index in move action.
+     */
+    public static final EditorString MOVE_INVALID_INDEX = EditorString.of("editor.list.move.invalid_index", "Invalid index: %s");
+    /**
+     * The error message for invalid new index in move action.
+     */
+    public static final EditorString MOVE_INVALID_NEW_INDEX = EditorString.of("editor.list.move.invalid_new_index", "Invalid new index: %s");
+    /**
+     * The error message for index out of bounds in move action.
+     */
+    public static final EditorString MOVE_OUT_OF_BOUNDS = EditorString.of("editor.list.move.out_of_bounds", "Index out of bounds: %d");
+    /**
+     * The error message for new index out of bounds in move action.
+     */
+    public static final EditorString MOVE_NEW_OUT_OF_BOUNDS = EditorString.of("editor.list.move.new_out_of_bounds", "New index out of bounds: %d");
+    /**
+     * The success message for moving an element.
+     */
+    public static final EditorString MOVE_SUCCESS = EditorString.of("editor.list.move.success", "Moved element at index %d to index %d");
+    /**
+     * The description message for the move action.
+     */
+    public static final EditorString MOVE_DESCRIPTION = EditorString.of("editor.list.move.description", "Move element to a new index");
+    /**
+     * The usage message for the move action.
+     */
+    public static final EditorString MOVE_USAGE = EditorString.of("editor.list.move.usage", "<index> <newIndex>");
+
     private final List<T> list = new ArrayList<>();
     private final Map<String, EditorAction> actionMap;
 
@@ -27,11 +120,11 @@ public abstract class ListEditor<T> implements Editor<List<T>> {
             public void execute(EditorActor actor, String[] args) {
                 T value = create(actor, args);
                 if (value == null) {
-                    actor.sendMessage("Cannot create (" + Arrays.toString(args) + ")", false);
+                    actor.sendMessage(CREATE_CANNOT_CREATE, Arrays.toString(args));
                     return;
                 }
                 list.add(value);
-                actor.sendMessage("Added (" + Arrays.toString(args) + ") at index " + (list.size() - 1), true);
+                actor.sendMessage(CREATE_SUCCESS, Arrays.toString(args), list.size() - 1);
             }
 
             @Override
@@ -40,12 +133,12 @@ public abstract class ListEditor<T> implements Editor<List<T>> {
             }
 
             @Override
-            public String description() {
-                return "Add element to list";
+            public EditorString description() {
+                return CREATE_DESCRIPTION;
             }
 
             @Override
-            public String usage() {
+            public EditorString usage() {
                 return createUsage();
             }
         });
@@ -59,23 +152,23 @@ public abstract class ListEditor<T> implements Editor<List<T>> {
                 try {
                     index = Integer.parseInt(args[0]);
                 } catch (NumberFormatException e) {
-                    actor.sendMessage("Invalid index: " + args[0], false);
+                    actor.sendMessage(EDIT_INVALID_INDEX, args[0]);
                     return;
                 }
                 if (index < 0 || index >= list.size()) {
-                    actor.sendMessage("Index out of bounds: " + index, false);
+                    actor.sendMessage(EDIT_OUT_OF_BOUNDS, index);
                     return;
                 }
                 T value = list.get(index);
                 T edited = edit(value, actor, Arrays.copyOfRange(args, 1, args.length));
                 if (edited == null) {
-                    actor.sendMessage("Cannot edit (" + Arrays.toString(args) + ")", false);
+                    actor.sendMessage(EDIT_CANNOT_EDIT, Arrays.toString(args));
                     return;
                 }
                 if (edited != value) {
                     list.set(index, edited);
                 }
-                actor.sendMessage("Edited (" + Arrays.toString(args) + ")", true);
+                actor.sendMessage(EDIT_SUCCESS, Arrays.toString(args));
             }
 
             @Override
@@ -102,13 +195,13 @@ public abstract class ListEditor<T> implements Editor<List<T>> {
             }
 
             @Override
-            public String description() {
-                return "Edit element in the list";
+            public EditorString description() {
+                return EDIT_DESCRIPTION;
             }
 
             @Override
-            public String usage() {
-                return "<index> " + editUsage();
+            public EditorString usage() {
+                return editUsage();
             }
         });
         this.actionMap.put("remove", new EditorAction() {
@@ -121,15 +214,15 @@ public abstract class ListEditor<T> implements Editor<List<T>> {
                 try {
                     index = Integer.parseInt(args[0]);
                 } catch (NumberFormatException e) {
-                    actor.sendMessage("Invalid index: " + args[0], false);
+                    actor.sendMessage(REMOVE_INVALID_INDEX, args[0]);
                     return;
                 }
                 if (index < 0 || index >= list.size()) {
-                    actor.sendMessage("Index out of bounds: " + index, false);
+                    actor.sendMessage(REMOVE_OUT_OF_BOUNDS, index);
                     return;
                 }
                 list.remove(index);
-                actor.sendMessage("Removed element at index " + index, true);
+                actor.sendMessage(REMOVE_SUCCESS, index);
             }
 
             @Override
@@ -143,13 +236,13 @@ public abstract class ListEditor<T> implements Editor<List<T>> {
             }
 
             @Override
-            public String description() {
-                return "Remove element at index";
+            public EditorString description() {
+                return REMOVE_DESCRIPTION;
             }
 
             @Override
-            public String usage() {
-                return "<index>";
+            public EditorString usage() {
+                return REMOVE_USAGE;
             }
         });
         this.actionMap.put("move", new EditorAction() {
@@ -163,7 +256,7 @@ public abstract class ListEditor<T> implements Editor<List<T>> {
                 try {
                     index = Integer.parseInt(args[0]);
                 } catch (NumberFormatException e) {
-                    actor.sendMessage("Invalid index: " + args[0], false);
+                    actor.sendMessage(MOVE_INVALID_INDEX, args[0]);
                     return;
                 }
 
@@ -171,24 +264,24 @@ public abstract class ListEditor<T> implements Editor<List<T>> {
                 try {
                     newIndex = Integer.parseInt(args[1]);
                 } catch (NumberFormatException e) {
-                    actor.sendMessage("Invalid new index: " + args[1], false);
+                    actor.sendMessage(MOVE_INVALID_NEW_INDEX, args[1]);
                     return;
                 }
 
                 if (index < 0 || index >= list.size()) {
-                    actor.sendMessage("Index out of bounds: " + index, false);
+                    actor.sendMessage(MOVE_OUT_OF_BOUNDS, index);
                     return;
                 }
 
                 if (newIndex < 0 || newIndex >= list.size()) {
-                    actor.sendMessage("New index out of bounds: " + newIndex, false);
+                    actor.sendMessage(MOVE_NEW_OUT_OF_BOUNDS, newIndex);
                     return;
                 }
 
                 T value = list.get(index);
                 list.remove(index);
                 list.add(newIndex, value);
-                actor.sendMessage("Moved element at index " + index + " to index " + newIndex, true);
+                actor.sendMessage(MOVE_SUCCESS, index, newIndex);
             }
 
             @Override
@@ -202,13 +295,13 @@ public abstract class ListEditor<T> implements Editor<List<T>> {
             }
 
             @Override
-            public String description() {
-                return "Move element to a new index";
+            public EditorString description() {
+                return MOVE_DESCRIPTION;
             }
 
             @Override
-            public String usage() {
-                return "<index> <newIndex>";
+            public EditorString usage() {
+                return MOVE_USAGE;
             }
         });
     }
@@ -236,8 +329,8 @@ public abstract class ListEditor<T> implements Editor<List<T>> {
      *
      * @return the usage
      */
-    protected String createUsage() {
-        return "[args...]";
+    protected EditorString createUsage() {
+        return CREATE_USAGE;
     }
 
     /**
@@ -264,8 +357,8 @@ public abstract class ListEditor<T> implements Editor<List<T>> {
      *
      * @return the usage
      */
-    protected String editUsage() {
-        return "[args...]";
+    protected EditorString editUsage() {
+        return EDIT_USAGE;
     }
 
     @Override

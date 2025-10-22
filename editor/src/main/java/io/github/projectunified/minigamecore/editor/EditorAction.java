@@ -20,7 +20,7 @@ public interface EditorAction {
      *
      * @return the description
      */
-    String description();
+    EditorString description();
 
     /**
      * Get the completion suggestions, given the arguments
@@ -38,7 +38,7 @@ public interface EditorAction {
      *
      * @return the usage
      */
-    default String usage() {
-        return "";
+    default EditorString usage() {
+        return EditorString.EMPTY;
     }
 }

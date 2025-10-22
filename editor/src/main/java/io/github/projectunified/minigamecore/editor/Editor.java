@@ -12,6 +12,15 @@ import java.util.Optional;
  */
 public interface Editor<T> extends EditorAction {
     /**
+     * The string of the usage of the editor
+     */
+    EditorString USAGE = EditorString.of("editor.usage", "<action> [args]");
+    /**
+     * The string of the message when the actor executes an invalid action
+     */
+    EditorString INVALID_ACTION = EditorString.of("editor.invalid_action", "Invalid action: %s");
+
+    /**
      * The map of all available actions of the editor
      *
      * @return the action map
@@ -46,13 +55,14 @@ public interface Editor<T> extends EditorAction {
     void migrate(T data);
 
     @Override
-    default String description() {
-        return getClass().getSimpleName();
+    default EditorString description() {
+        String simpleClassName = getClass().getSimpleName();
+        return EditorString.of("editor.description." + simpleClassName, simpleClassName);
     }
 
     @Override
-    default String usage() {
-        return "<action> [args]";
+    default EditorString usage() {
+        return USAGE;
     }
 
     @Override
@@ -83,7 +93,7 @@ public interface Editor<T> extends EditorAction {
         String command = args[0];
         EditorAction action = actions().get(command);
         if (action == null) {
-            actor.sendMessage("Invalid action: " + command, false);
+            actor.sendMessage(INVALID_ACTION, command);
             return;
         }
         String[] subArgs = new String[args.length - 1];

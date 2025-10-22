@@ -5,12 +5,12 @@ package io.github.projectunified.minigamecore.editor;
  */
 public interface EditorActor {
     /**
-     * Send the message
+     * Send a message
      *
      * @param message the message
-     * @param success true if it's a success message
+     * @param args    the arguments
      */
-    void sendMessage(String message, boolean success);
+    void sendMessage(EditorString message, Object... args);
 
     /**
      * Send the usage of the action
